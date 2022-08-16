@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.14...3.23)
 
-project(HelloProject
+project(plog
   VERSION
     1.0
   DESCRIPTION
-    "a Hello Project!"
+    "a high performance log library"
   LANGUAGES
     CXX
 )
@@ -34,7 +34,7 @@ if(CCACHE_FOUND)
 endif(CCACHE_FOUND)
 
 # TODO: set you target name!
-set(LIBRARY_NAME mylib)
+set(LIBRARY_NAME plog)
 
 # 3rdparty dir:
 set(PROJECT_TRDPARTY_DIR ${PROJECT_SOURCE_DIR}/3rdparty)
