@@ -6,6 +6,28 @@
 
 namespace plog {
 
+std::string GetLogLevelStr(LogLevel log_level) {
+  switch (log_level) {
+#define XX(name)       \
+  case LogLevel::name: \
+    return #name;      \
+    break;
+
+    XX(TRACE);
+    XX(DEBUG);
+    XX(INFO);
+    XX(WARN);
+    XX(ERROR);
+    XX(FATAL);
+#undef XX
+
+    default:
+      return "UNKNOW";
+  }
+  return "UNKNOW";
+}
+
+
 void Logger::Info(const char *format, ...) {
   if (format == nullptr) {
     return;

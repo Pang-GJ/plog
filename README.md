@@ -1,85 +1,15 @@
-# Tiny C++ Project Template
-This is a tiny C++ project template using CMake.  
+# plog 
+plog means p(erformance) log
 
-The requirements are:
-- CMake 3.14+ highly recommended.
-- A C++17 compatible compiler (doctest needed!).
-- fmt (just I like it...)
-- doctest (test needed)
-- clang-format (optional)
-- clang-tidy (optional)
-- ccache
+## 发现的BUG解决方法汇总
 
-## How To Use ?
-To configure:
-```
-cmake -S . -B build
-```
-Add `-GNinja` if you have Ninja.
+### 1. 关于mmap的使用细节
+在第一次测试时发现了问题，mmap报错errno=22，也就是invalid argument。 
+分析了整个调用链之后发现是没有设置mmap的大小（在log_config.hpp中设置），
+简单设置之后问题仍未解决，原来是mmap映射区域大小必须是物理页大小(page_size)的整倍数（32位系统中通常是4k字节）。
+原因是，内存的最小粒度是页，而进程虚拟地址空间和内存的映射也是以页为单位。
+为了匹配内存的操作，mmap从磁盘到虚拟地址空间的映射也必须是页。
+详细介绍mmap的文章：[详细分析mmap](https://www.cnblogs.com/huxiao-tee/p/4660352.html)
 
-if you want to add tests, just add `-DBUILD_TESTS=on`  
-
-To build:
-```
-cmake --build build
-```
-
-To test(`--target` can be written as `-t` in CMake 3.15+):
-```
-cmake --build build --target test
-```
-
-To clang-format:
-```
-cmake --build build --target clangformat
-```
-
-To clang-tidy:
-```
-cmake --build build --target clangtidy
-```
-
-## An awesome way to use 
-
-Put the code in you bash or zsh (I use zsh):  
-```
-function taskpp() {
-  case "$1" in 
-    "new")
-      git clone https://github.com/Pang-GJ/cpp-project-template.git
-      mv cpp-project-template $2 && cd $2
-      rm -rf .git
-      git init .
-      git add .
-      git commit -m "Init C++ project"
-      git branch -m main
-      cd ..
-      ;;
-    "build")
-      cmake -S . -B build
-      cmake --build build
-      ;;
-    "test")
-      cmake -S . -B build -DBUILD_TESTS=on
-      cmake --build build --target $1
-      ;;
-    "format")
-      cmake --build build --target clangformat
-      ;;
-    "tidy")
-      cmake --build build --target clangtidy
-      ;;
-  esac 
-}
-```
-
-As you see, it's quite a simple shell script function.  
-To use it:
-```
-taskpp new <project-name> # create a project
-taskpp build # build && make
-taskpp test  # build for test
-taskpp format # clang-format
-taskpp tidy   # clang-tidy
-```
-(just a little like cargo in rust)
+### 2. mmap报错bad file descripter
+(尚未解决，下次再整)....

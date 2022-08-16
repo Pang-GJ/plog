@@ -55,8 +55,3 @@ class Logger {
 
 }  // namespace plog
 
-#define log_fatal(fmt, args...) plog::Logger::Fatal(fmt, ##args)
-#define log_error(fmt, args...) plog::Logger::Error(fmt, ##args)
-#define log_warn(fmt, args...) plog::Logger::Warn(fmt, ##args)
-#define log_debug(fmt, args...) plog::Logger::Debug(fmt, ##args)
-#define log_info(fmt, args...) plog::Logger::Info(fmt, ##args)
