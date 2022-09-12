@@ -22,7 +22,7 @@ class MMapFileWriter : public FileWriter {
     fd_ = open(basename.c_str(), O_RDWR | O_CREAT | O_TRUNC,
                S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     if (fd_ < 0) {
-      fprintf(stderr, "open new file failed, errno=%d", errno);
+      fprintf(stderr, "open new file failed, errno=%d\n", errno);
     } else {
       int n = ftruncate(fd_, mem_size);
       (void)n;
@@ -32,7 +32,7 @@ class MMapFileWriter : public FileWriter {
 
       if (buffer_ == MAP_FAILED) {
         perror("map");
-        fprintf(stderr, "mmap file failed, errno=%d", errno);
+        fprintf(stderr, "mmap file failed, errno=%d\n", errno);
       }
     }
   }
@@ -50,8 +50,13 @@ class MMapFileWriter : public FileWriter {
 
   void Append(const char *msg, int32_t len) override {
     if (len > mem_size_ - writen_) {
-      perror("map overflow");
-      fprintf(stderr, "mmap memory overflow, errno=%d", errno);
+      // 直接flush??先凑满一页再flush，避免因为msg太大一直无法读入??
+      memcpy(buffer_ + writen_, msg, mem_size_ - writen_);
+      Flush();
+      memcpy(buffer_, msg + mem_size_ - writen_, len - (mem_size_ - writen_));
+      writen_ = len - (mem_size_ - writen_);
+//      perror("map overflow");
+//      fprintf(stderr, "mmap memory overflow, errno=%d\n", errno);
       return;
     }
     memcpy(buffer_ + writen_, msg, len);

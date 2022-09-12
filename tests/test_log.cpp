@@ -11,10 +11,10 @@ void Benchmark() {
       "asyncfile",
       plog::LogAppenderInterface::Ptr(new plog::AsyncFileAppender("./log/")));
 
-  const int32_t count = 100;
+  const int32_t count = 1000000;
   auto start = std::chrono::system_clock::now();
   for (int32_t index = 0; index < count; ++index) {
-    plog::Logger::GetLogger()->Fatal("%d hello world", index);
+    plog::Logger::GetLogger()->Info("%d hello world\n", index);
   }
   auto end = std::chrono::system_clock::now();
   auto duration =
@@ -24,5 +24,6 @@ void Benchmark() {
 
 int main(int argc, char *argv[]) {
   Benchmark();
+  std::cout << "All done.." << std::endl;
   return 0;
 }
